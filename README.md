@@ -43,7 +43,7 @@ Aplikacja dostępna jest również na róznych platformach do pobrania w [tym mi
 **3. Instalacja pakietów**
 
 Jednym z najpopularniejszych pakietów do analizy przestrzennej w R jest pakiet [**terra**](https://github.com/rspatial/terra).
-Umożliwia on analizę zaróWno danych rastrowych i wektorowych.
+Umożliwia on analizę zarówno danych rastrowych i wektorowych.
 Można go zainstalować w następujący sposób:
 
 ```r
