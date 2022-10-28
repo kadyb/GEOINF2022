@@ -147,20 +147,65 @@ plotRGB(landsat, r = 4, g = 3, b = 2, scale = 1, stretch = "lin")
 ## Klasteryzacja
 
 ```{r}
-library("cluster") # zawiera modele do klasyfikacji
+# wczytanie pakietu do klasteryzacji
+library("cluster")
 ```
 
+Modele do klasteryzacji (oraz klasyfikacji nadzorowanej) wymagają macierzy 
+lub ramki danych. Zatem dane do treningu musimy przygotować w odpowiedni sposób.
+Raster można sprowadzić do macierzy przy użyciu funkcji `values()`.
+
+```{r}
+mat = values(landsat)
+nrow(mat) # wyświetla liczbę wierszy
+```
+
+Za pomocą funkcji `View()` możemy sprawdzić jak wygląda nasza macierz.
+Jak łatwo można zauważyć, mnóstwo jej wartości oznaczonych jest jako brak danych
+(głównie są to wartości poza obszarem analizy). Zazwyczaj modele nie obsługują
+NA, więc musimy je usunąć. Służy do tego dedykowana funkcja `na.omit()`.
+
+```{r}
+mat_omit = na.omit(mat)
+nrow(mat_omit)
+```
+
+Teraz przejdziemy do najważniejszego etapu analizy, czyli do wytrenowania modelu.
+Użyjemy najprostszego modelu [grupowania k-średnich](https://www.statsoft.pl/textbook/stcluan.html#k) (*k-means*).
+Ten model wymaga jedynie, aby podać z góry liczę klastrów (grup).
+Jest to algorytm stochastyczny, więc za każdym razem zwraca inne wyniki.
+Żeby analiza była powtarzalna musimy ustawić ziarno losowości - `set.seed()`.
+
+```{r}
+set.seed(123)
+mdl = kmeans(mat_omit, centers = 5)
+mdl$centers # obliczone średnie wartości klastrów
+```
+
+W wyniku powyższej operacji otrzymaliśmy m. in.:
+1. Obliczone średnie wartości klastrów dla poszczególnych kanałóW (`mdl$centers`).
+2. Wektor ze sklasyfikowanymi wartościami macierzy (`mdl$cluster`).
+
+Wyświetlmy te obiekty:
+
+```{r}
+mdl$centers
+```
+
+```{r}
+head(mdl$cluster) # wyświetla pierwsze 6 elementów
+```
+
+Oznacza to, że pierwszy wiersz (piksel) należy do grupy 3, drugi do grupy 2,
+trzecu do grupy 2, itd. Kolejnym etapem jest stworzenie mapy na podstawie
+otrzymanego wektora z klastrami.
+
+Na początku musimy przygotować pusty wektor składający się z całkowitej liczby
+pikseli rastra. Można to sprawdzić za pomocą funkcji `ncell()`. W naszym
+przypadku jest to 1 238 760. ........
 
 
 ```{r}
-# get values from raster to matrix
-mat = values(landsat)
-mat_omit = na.omit(mat) # drop NA values
-
-# clustering using k-means
-set.seed(123)
-mdl = kmeans(mat_omit, centers = 5)
-#mdl
 
 # prepare vector with clusters
 vec = rep(NA, ncell(landsat))
