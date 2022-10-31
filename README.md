@@ -19,12 +19,6 @@ Kolejne podręczniki (w języku angielskim) dotyczące przestrzennej analizy dan
   - [Geocomputation with R](https://geocompr.robinlovelace.net/)
   - [Spatial Data Science, with applications in R](https://r-spatial.org/book/)
 
-**Wymagania techniczne**
-
-Komputer powinien posiadać minumum 8 GB pamięci RAM oraz 5 GB wolnego miejsca na dysku.
-Jeśli nie masz dostępu do takiej konfuguracji sprzętowej, to w folderze "dane" znajduje się mniejszy plik rastrowy oraz wektorowy.
-System operacyjny jest dowolny, ale najłatwiej zainstalować wszystkie zależności na Windows.
-
 ## Wstęp
 
 **1. Instalacja R**
