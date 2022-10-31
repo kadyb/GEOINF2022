@@ -50,7 +50,7 @@ Następnie można go załadować używając funkcji `library()`.
 library("terra")
 ```
 
-Dokumentacje do tego pakietu znajdziesz tutaj: https://rspatial.github.io/terra/reference/terra-package.html
+Dokumentacje do tego pakietu znajdziesz tutaj: <https://rspatial.github.io/terra/reference/terra-package.html>
 
 ## Materiały
 
