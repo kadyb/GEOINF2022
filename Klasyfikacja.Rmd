@@ -18,7 +18,6 @@ library("terra")
 
 ```{r}
 files = list.files("dane/landsat", pattern = "\\.TIF$", full.names = TRUE)
-files
 landsat = rast(files)
 names(landsat) = paste0("B", 1:7)
 ```
@@ -40,6 +39,7 @@ Służy do tego funkcja `read.csv()`.
 
 ```{r}
 leg = read.csv("dane/S2GLC_T33UXT.csv")
+head(leg)
 ```
 
 W pierwszej kolumnie znajduje się ID klasy, w drugiej wartość koloru RGB w
