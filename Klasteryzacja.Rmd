@@ -28,7 +28,7 @@ files
 ```
 
 Kiedy utworzyliśmy już listę plikóW, możemy je wczytać przy pomocy
-funkcji `rast()` z pakietu `{terra}` i następnie wyświetlić metadane.
+funkcji `rast()` z pakietu **terra** i następnie wyświetlić metadane.
 
 ```{r}
 # wczytanie danych rastrowych
