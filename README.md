@@ -28,8 +28,8 @@ Można go pobrać dla [Windows](https://cloud.r-project.org/bin/windows/base/R-4
 
 **2. Instalacja RStudio**
 
-**RStudio** natomiast jest zintegrowanym środowskiem programistycznym z edytorem kodu.
-Aplikacja dostępna jest również na róznych platformach do pobrania w [tym miejscu](https://www.rstudio.com/products/rstudio/download/).
+**RStudio** natomiast jest zintegrowanym środowiskiem programistycznym z edytorem kodu.
+Aplikacja dostępna jest również na różnych platformach do pobrania w [tym miejscu](https://www.rstudio.com/products/rstudio/download/).
 
 **3. Instalacja pakietów**
 
