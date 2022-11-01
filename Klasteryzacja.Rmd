@@ -18,7 +18,8 @@ W tym celu możemy wykorzystać funkcję `list.files()`, która jako argument pr
 wczytać (`pattern = "\\.TIF$"`) oraz zwrócić ścieżki bezwzględne do plików.
 
 ```{r}
-files = list.files("dane", pattern = "\\.TIF$", full.names = TRUE)
+# listowanie plikóW z katalogu
+files = list.files("dane/landsat", pattern = "\\.TIF$", full.names = TRUE)
 files
 ```
 
@@ -26,6 +27,7 @@ Kiedy utworzyliśmy już listę plikóW, możemy je wczytać przy pomocy
 funkcji `rast()` z pakietu `{terra}` i następnie wyświetlić metadane.
 
 ```{r}
+# wczytanie danych rastrowych
 landsat = rast(files)
 landsat # odwołanie się do obiektu wyświetla metadane
 ```
@@ -46,6 +48,7 @@ Wczytanie danych wektorowych odbywa się w analogiczny sposób za pomocą funkcj
 `vect()`.
 
 ```{r}
+# wczytanie danych wektorowych
 poly = vect("dane/powiat_sremski.gpkg")
 poly
 ```
@@ -53,6 +56,7 @@ poly
 Teraz możemy przygotować prostą wizualizację jednego kanału oraz poligonu.
 
 ```{r}
+# wizualizacja
 plot(landsat[[1]])
 plot(poly, add = TRUE)
 ```
@@ -255,6 +259,7 @@ standardowe funkcje do wizualizacji wymagają formy szerokiej (wiele kolumn).
 Takiej zmiany można dokonać w prosty sposób używając pakietu **tidyr**.
 
 ```{r message=FALSE}
+# install.packages(c("tidyr", "ggplot2"))
 library("tidyr") # transformacja danych
 library("ggplot2") # wizualizacja danych
 ```
