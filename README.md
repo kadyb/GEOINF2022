@@ -55,7 +55,7 @@ Dokumentacje do tego pakietu znajdziesz tutaj: <https://rspatial.github.io/terra
 ## Materiały
 
 1. [Klasyfikacja nienadzorowana](https://kadyb.github.io/GEOINF2022/Klasteryzacja.html)
-2. Klasyfikacja nadzorowana
+2. [Klasyfikacja nadzorowana](https://kadyb.github.io/GEOINF2022/Klasyfikacja.html)
 
 ## Kontakt
 
