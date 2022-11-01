@@ -1,7 +1,10 @@
 ---
 title: "Klasyfikacja nienadzorowana"
 author: "Krzysztof Dyba"
-output: html_document
+output:
+  html_document:
+    toc: yes
+    toc_float: true
 date: 02.12.2022 r.
 ---
 
@@ -53,7 +56,8 @@ poly = vect("dane/powiat_sremski.gpkg")
 poly
 ```
 
-Teraz możemy przygotować prostą wizualizację jednego kanału oraz poligonu.
+Teraz możemy przygotować prostą wizualizację jednego kanału (np. ultra blue; B1)
+oraz poligonu.
 
 ```{r}
 # wizualizacja

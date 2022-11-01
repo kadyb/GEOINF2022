@@ -1,7 +1,10 @@
 ---
 title: "Klasyfikacja nadzorowana"
 author: "Krzysztof Dyba"
-output: html_document
+output:
+  html_document:
+    toc: yes
+    toc_float: true
 date: 02.12.2022 r.
 ---
 
@@ -193,7 +196,7 @@ unname(head(pred)) # `unname()` usuwa numer porządkowy wiersza/piksela
 ```
 
 Wykonaliśmy predykcje dla zbioru testowego. Teraz musimy obliczyć wybraną
-miarę skuteczności. Jako przykład wybierzemy skuteczność (*accuracy*) definiowaną
+miarę skuteczności. Jako przykład wybierzemy dokładność (*accuracy*) definiowaną
 jako iloraz poprawnych klasyfikacji do sumy poprawnych i niepoprawnych klasyfikacji.
 
 ```{r}
@@ -231,7 +234,7 @@ który znajduje się w obiekcie `leg`. Tą operację należy wykonać w dwóch k
 2. Dopasować kolory do odpowiednich klas.
 
 Odnośnie punkty pierwszego, to najprościej wykorzystać funkcję `droplevels()`,
-która usunie puste kategorie z rastra (np. bagno, wrzosowisko). Następnie
+która usunie puste kategorie z rastra (np. winnica, wrzosowisko). Następnie
 należy wyświetlić kategorie za pomocą funkcji `levels()`. Do każdej warstwy rastra
 mogą być przypisane różne kategorie, więc musimy pobrać je tylko dla pierwszej
 warstwy oraz wskazać atrybut `class`.
