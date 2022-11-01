@@ -52,7 +52,7 @@ Landsat ma 30 m, natomiast klasy pokrycia terenu 10 m). Kiedy rastry posiadają
 różne rozdzielczości, to nie jest możliwe wykonywanie na nich operacji matematycznych.
 W takim przypadku musimy sprowadzić je do jednakowej rozdzielczości. Z racji iż
 proste metody przepróbkowania nie zwiększają ilości informacji przy upscalingu,
-to lepiej sprowadzić przepróbkowanie do niższej rozdzielczości.
+to lepiej wykonać przepróbkowanie do niższej rozdzielczości.
 
 Przepróbkowanie (*resampling*) można wykonać przy pomocy funkcji `resample()`.
 Dostępne są różne metody przepróbkowania, ale w przypadku danych kategorycznych,
