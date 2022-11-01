@@ -51,7 +51,7 @@ W takim przypadku musimy sprowadzić je do jednakowej rozdzielczości. Z racji i
 proste metody przepróbkowania nie zwiększają ilości informacji przy upscalingu,
 to lepiej sprowadzić przepróbkowanie do niższej rozdzielczości.
 
-Przepróbkowanie (*resampling*) można wykonać przy pomocji funkcji `resample()`.
+Przepróbkowanie (*resampling*) można wykonać przy pomocy funkcji `resample()`.
 Dostępne są różne metody przepróbkowania, ale w przypadku danych kategorycznych,
 koniecznie trzeba wykorzystać algorytm najbliższego sąsiada (`method = "near"`).
 Jeśli tego nie zrobimy, to ID kategorii zostaną zmienione.
@@ -104,7 +104,7 @@ Dodatkowo, jeszcze zmieńmy nazwę kolumny z `S2GLC_T33UXT` na `klasa`.
 data = merge(data, leg[, -2], by.x = "S2GLC_T33UXT", by.y = "ID")
 data = data[, -1] # usuń pierwszą kolumnę z ID klasy
 colnames(data)[8] = "klasa" # zmień nazwę kolumny
-data$klasa = as.factor(data$klasa) # zamień typ danych na kategoryczny
+data$klasa = as.factor(data$klasa) # zmień typ danych na kategoryczny
 ```
 
 Dane wejściowe wyglądają teraz w ten sposób.
@@ -125,7 +125,8 @@ Częstość występowania klas można sprawdzić za pomocą funkcji `table()` na
 kategorycznej i następnie zamienić to na postać procentową używając `prop.table()`.
 
 ```{r}
-prop.table(table(data$klasa)) * 100
+tabela = table(data$klasa)
+prop.table(tabela) * 100
 ```
 
 ## Klasyfikacja
@@ -148,9 +149,9 @@ wylosować próbę o ustalonej wielkości używając funkcji `sample()`.
 # podział na zbiór treningowy i testowy
 set.seed(1) # ziarno losowości
 n = round(0.7 * nrow(data)) # wielkość próby 70%
-trainIndex = sample(nrow(data), size = n)
-train = data[trainIndex, ]
-test = data[-trainIndex, ]
+trainIndex = sample(nrow(data), size = n) # wylosuj indeksy
+train = data[trainIndex, ] # wybierz próbki treningowe
+test = data[-trainIndex, ] # wybierz próbki testowe (nietreningowe)
 ```
 
 Po tej czynności dochodzimy do najważniejszego etapu, czyli trenowania modelu
@@ -213,31 +214,45 @@ natomiast obiekty sklasyfikowane jako fałszywe negatywne (*false negative*) w
 lewej dolnej części.
 
 Jeśli opracowany model spełnia nasze oczekiwania, to możemy wykorzystać go do
-predykcji na calym obszarze. Ponownie wykorzystamy funkcje `predict()`, ale tym razem
-jako dane wejściowe użyjemy nasz raster `landsat`.
+predykcji na całym obszarze. Ponownie wykorzystamy funkcję `predict()`, ale tym
+razem jako dane wejściowe użyjemy nasz raster `landsat`. Dodatkowo, powinniśmy
+ustawić argument `na.rm = TRUE`, aby uniknąć predykcji poza obszarem analizy.
 
 ```{r}
-pred_map = predict(landsat, mdl, type = "class", na.rm = TRUE,
-                   factors = levels(train$klasa))
+pred_map = predict(landsat, mdl, type = "class", na.rm = TRUE)
 ```
 
-```{r}
-plot(pred_map, type = "class", main = "Prediction")
-```
+Jako wynik powyższej operacji otrzymaliśmy mapę z predykcją klas pokrycia terenu.
+Teraz możemy dokonać wizualizacji. Tak jak w poprzednich przykładach wykorzystamy
+funkcję `plot()`. Jednak tym razem musimy wykorzystać odpowiedni schemat koloróW,
+który znajduje się w obiekcie `leg`. Tą operację należy wykonać w dwóch krokach:
+
+1. Sprawdzić, które klasy rzeczywiście występują na naszym obszarze.
+2. Dopasować kolory do odpowiednich klas.
+
+Odnośnie punkty pierwszego, to najprościej wykorzystać funkcję `droplevels()`,
+która usunie puste kategorie z rastra (np. bagno, wrzosowisko). Następnie
+należy wyświetlić kategorie za pomocą funkcji `levels()`. Do każdej warstwy rastra
+mogą być przypisane różne kategorie, więc musimy pobrać je tylko dla pierwszej
+warstwy oraz wskazać atrybut `class`.
+
+Dopasowania koloróW można dokonać za pomocą funkcji `match()`. Jako pierwszy
+wskazujemy obiekt z naszymi klasami, jako drugi obiekt ramkę danych ze schematem
+koloróW i w wyniku otrzymamy dopasowane indeksy kolorów.
 
 ```{r}
-names = data.frame(ID = seq_along(levels(train$klasa)),
-                   name = levels(train$klasa))
-levels(pred_map) = names
+lv = levels(droplevels(pred_map))[[1]][["class"]]
+col_idx = match(lv, leg$Klasa)
+plot(pred_map, main = "Predykcja klas", col = leg$RGB[col_idx])
 ```
 
-```{r}
-colors_1 = c("#086209", "#239800", "#f99627", "#fdd327", "#1445f9", "#d20000")
-plot(pred_map, col = colors_1, main = "Prediction")
-```
+W przypadku, gdy raster posiada oryginalne ID klas (tj. 0, 62, 73, 75, itd.),
+to możemy po prostu przypisać ramkę danych do rastra.
 
 ```{r}
 levels(cat) = leg[, c(1, 3)]
-plot(cat, col = leg$RGB, main = "True")
+lv = levels(droplevels(cat))[[1]][["Klasa"]]
+col_idx = match(lv, leg$Klasa)
+plot(cat, col = leg$RGB[col_idx], main = "Rzeczywiste klasy")
 ```
 
