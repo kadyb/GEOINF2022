@@ -18,7 +18,8 @@ library("terra")
 W pierwszym kroku musimy wylistować dane (rastry), które zamierzamy wczytać.
 W tym celu możemy wykorzystać funkcję `list.files()`, która jako argument przyjmuje
 ścieżkę do folderu z plikami. Oprócz tego musimy wskazać jaki rodzaj plików chcemy
-wczytać (`pattern = "\\.TIF$"`) oraz zwrócić ścieżki bezwzględne do plików.
+wczytać (`pattern = "\\.TIF$"`) oraz zwrócić pełne ścieżki do plików
+(`full.names = TRUE`).
 
 ```{r}
 # listowanie plikóW z katalogu
