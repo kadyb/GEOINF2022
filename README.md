@@ -51,6 +51,11 @@ Dokumentacje do tego pakietu znajdziesz tutaj: <https://rspatial.github.io/terra
 
 ## Materiały
 
+Niezbędne dane rastrowe (scena Landsat, klasyfikacja pokrycia terenu) oraz wektorowe znajdziesz na [Dysku Google](https://drive.google.com/file/d/1ZhKanbDEQXvPJHD76VlcHk1rucG4hss5/view).
+Po pobraniu dane należy rozpakować.
+
+Interaktywne zeszyty (.Rmd) oraz statyczne dokumenty (.html) znajdziesz w niniejszym repozytorium.
+
 1. [Klasyfikacja nienadzorowana](https://kadyb.github.io/GEOINF2022/Klasteryzacja.html)
 2. [Klasyfikacja nadzorowana](https://kadyb.github.io/GEOINF2022/Klasyfikacja.html)
 
