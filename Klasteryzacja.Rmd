@@ -27,7 +27,7 @@ files = list.files("dane/landsat", pattern = "\\.TIF$", full.names = TRUE)
 files
 ```
 
-Kiedy utworzyliśmy już listę plikóW, możemy je wczytać przy pomocy
+Kiedy utworzyliśmy już listę plików, możemy je wczytać przy pomocy
 funkcji `rast()` z pakietu **terra** i następnie wyświetlić metadane.
 
 ```{r}
@@ -62,7 +62,7 @@ oraz poligonu.
 
 ```{r}
 # wizualizacja
-plot(landsat[[1]])
+plot(landsat[[1]]) # alternatywnie: plot(landsat[["B1"]])
 plot(poly, add = TRUE)
 ```
 
@@ -145,11 +145,10 @@ landsat[landsat > 1] = 1
 
 Po przeskalowaniu wartości możemy wyświetlić kompozycję RGB. W tym przypadku
 zamiast funkcji `plot()` należy użyć funkcji `plotRGB()` oraz zdefiniować 
-kolejność kanałóW czerwonego, zielonego oraz niebieskiego. Oprócz tego,
+kolejność kanałów czerwonego, zielonego oraz niebieskiego. Oprócz tego,
 należy podać maksymalną wartość odbicia dla kanałów (w naszym przypadku `scale = 1`).
 Często zdarza się, że kompozycje są zbyt ciemne/jasne, wtedy warto zastosować
-rozciągnięcie histogramów używając argumentu `stretch = "lin"` lub
-`stretch = "hist"`.
+rozciągnięcie kolorów używając argumentu `stretch = "lin"` lub `stretch = "hist"`.
 
 ```{r}
 plotRGB(landsat, r = 4, g = 3, b = 2, scale = 1, stretch = "lin")
@@ -195,7 +194,7 @@ mdl = kmeans(mat_omit, centers = 5)
 
 W wyniku powyższej operacji otrzymaliśmy m. in.:
 
-1. Obliczone średnie wartości klastrów dla poszczególnych kanałóW (`mdl$centers`).
+1. Obliczone średnie wartości klastrów dla poszczególnych kanałów (`mdl$centers`).
 2. Wektor ze sklasyfikowanymi wartościami macierzy (`mdl$cluster`).
 
 Wyświetlmy te obiekty:

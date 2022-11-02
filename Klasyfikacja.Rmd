@@ -78,8 +78,8 @@ landsat[landsat > 1] = NA
 
 ## Przygotowanie danych
 
-Teraz przygotujmy nasze dane do klasyfikacji. Tym razem skorzystamy z [drzewa
-decyzyjnego](https://www.statsoft.pl/textbook/stclatre.html), które wymaga danych
+Teraz przygotujmy nasze dane do klasyfikacji. Tym razem jako model użyjemy [drzewo
+decyzyjne](https://www.statsoft.pl/textbook/stclatre.html), które wymaga danych
 w postaci ramki danych (*data frame*). Jedna kolumna to zmienna modelowana/zależna
 (u nas klasy pokrycia terenu), a pozostałe kolumny to zmienne wyjaśniające/niezależne
 (kanały spektralne).
@@ -101,7 +101,7 @@ data = data[!data$S2GLC_T33UXT == 0, ]
 
 W celu ułatwienia analizy danych, możemy ID klasy zamienić na nazwę.
 Dopasowanie nazw klas do ID można wykonać za pomocą funkcji `merge()`.
-Dodatkowo, jeszcze zmieńmy nazwę kolumny z `S2GLC_T33UXT` na `klasa`.
+Dodatkowo, zmieńmy jeszcze nazwę kolumny z `S2GLC_T33UXT` na `klasa`.
 
 ```{r}
 data = merge(data, leg[, -2], by.x = "S2GLC_T33UXT", by.y = "ID")
@@ -110,14 +110,14 @@ colnames(data)[8] = "klasa" # zmień nazwę kolumny
 data$klasa = as.factor(data$klasa) # zmień typ danych na kategoryczny
 ```
 
-Dane wejściowe wyglądają teraz w ten sposób.
+Dane wejściowe wyglądają teraz następująco.
 
 ```{r}
 head(data)
 ```
 
-Jeszcze przed samą klasyfikacją warto sprawdzić rozkład kategorii, tj. jak często
-pojawiają się poszczególne kategorie. Jeśli część kategorii pojawia się bardzo często,
+Przed klasyfikacją warto sprawdzić rozkład kategorii, tj. jak często pojawiają
+się poszczególne kategorie. Jeśli część kategorii pojawia się bardzo często,
 a niektóre prawie wcale, to wtedy mamy problem z niezbalansowanym zbiorem danych.
 W takiej sytuacji, kiedy model posiada zbyt mało przykładów którejś klasy (np. bagna),
 to nie jest możliwe żeby nauczył się rozpoznawać tę klasę. Oprócz tego, wynik
@@ -168,7 +168,8 @@ zdefiniowania:
 Odnośnie punkty pierwszego, formułę można zdefiniować na dwa sposoby:
 
 1. Używając nazw poszczególnych zmiennych: `klasa ~ B1 + B2 + B3 + B4 + B5 + B6 + B7`.
-2. Używając kropki: `klasa ~ .`. Kropka zastępuje wszystkie nazwy z ramki danych.
+2. Używając kropki: `klasa ~ .`. Kropka zastępuje wszystkie nazwy zmiennych
+wyjaśniających z ramki danych.
 
 Znak `~` (tylda) oznacza "jest zależne od", czyli *klasa pokrycia terenu jest
 zależna od kanałów B1 do B7*.
@@ -184,10 +185,11 @@ nauczył się model. Drzewo decyzyjne można zwizualizować za pomocą funkcji `
 prp(mdl)
 ```
 
-Kluczowym etapem jest walidacja modelu. Sprawdźmy zatem jaka jest jego skuteczność.
-W tym celu musimy wykonać predykcję dla zbioru testowego (funkcja `predict()`).
-Zbiór danych testowych musi posiadać dokładnie te same zmienne wyjaśniające
-co zbiór treningowy. Kolumnę z prawdziwymi klasami należy usunąć.
+Kluczowym etapem modelowania jest walidacja modelu. Sprawdźmy zatem jaka jest
+jego skuteczność. W tym celu musimy wykonać predykcję dla zbioru testowego
+(funkcja `predict()`). Zbiór danych testowych musi posiadać dokładnie te same
+zmienne wyjaśniające co zbiór treningowy. Kolumnę z prawdziwymi (rzeczywistymi)
+klasami należy usunąć.
 
 ```{r}
 # walidacja dla zbioru testowego
@@ -227,7 +229,7 @@ pred_map = predict(landsat, mdl, type = "class", na.rm = TRUE)
 
 Jako wynik powyższej operacji otrzymaliśmy mapę z predykcją klas pokrycia terenu.
 Teraz możemy dokonać wizualizacji. Tak jak w poprzednich przykładach wykorzystamy
-funkcję `plot()`. Jednak tym razem musimy wykorzystać odpowiedni schemat koloróW,
+funkcję `plot()`. Jednak tym razem musimy wykorzystać odpowiedni schemat kolorów,
 który znajduje się w obiekcie `leg`. Tą operację należy wykonać w dwóch krokach:
 
 1. Sprawdzić, które klasy rzeczywiście występują na naszym obszarze.
@@ -239,9 +241,9 @@ należy wyświetlić kategorie za pomocą funkcji `levels()`. Do każdej warstwy
 mogą być przypisane różne kategorie, więc musimy pobrać je tylko dla pierwszej
 warstwy oraz wskazać atrybut `class`.
 
-Dopasowania koloróW można dokonać za pomocą funkcji `match()`. Jako pierwszy
+Dopasowania kolorów można dokonać za pomocą funkcji `match()`. Jako pierwszy
 wskazujemy obiekt z naszymi klasami, jako drugi obiekt ramkę danych ze schematem
-koloróW i w wyniku otrzymamy dopasowane indeksy kolorów.
+kolorów (`leg`) i w wyniku otrzymamy dopasowane indeksy kolorów.
 
 ```{r}
 lv = levels(droplevels(pred_map))[[1]][["class"]]
