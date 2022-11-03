@@ -24,12 +24,12 @@ Kolejne podręczniki (w języku angielskim) dotyczące przestrzennej analizy dan
 **1. Instalacja R**
 
 **R** jest językiem programowania.
-Można go pobrać dla [Windows](https://cloud.r-project.org/bin/windows/base/R-4.2.1-win.exe), [MacOS](https://cloud.r-project.org/bin/macosx/) oraz [Linux](https://cloud.r-project.org/bin/linux/).
+Można go pobrać dla [Windows](https://cloud.r-project.org/bin/windows/base/R-4.2.2-win.exe), [MacOS](https://cloud.r-project.org/bin/macosx/) oraz [Linux](https://cloud.r-project.org/bin/linux/).
 
 **2. Instalacja RStudio**
 
 **RStudio** natomiast jest zintegrowanym środowiskiem programistycznym z edytorem kodu.
-Aplikacja dostępna jest również na różnych platformach do pobrania w [tym miejscu](https://www.rstudio.com/products/rstudio/download/).
+Aplikacja dostępna jest również na różnych platformach do pobrania w [tym miejscu](https://posit.co/download/rstudio-desktop/).
 
 **3. Instalacja pakietów**
 
