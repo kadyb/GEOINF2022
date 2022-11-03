@@ -96,6 +96,7 @@ w czasie, dlatego powinniśmy usunąć tę klasę (`ID = 0`).
 
 ```{r}
 # usuń piksele reprezentujące klasę chmury
+# ! to operator negacji (NOT)
 data = data[!data$S2GLC_T33UXT == 0, ]
 ```
 
@@ -199,10 +200,12 @@ unname(head(pred)) # `unname()` usuwa numer porządkowy wiersza/piksela
 
 Wykonaliśmy predykcje dla zbioru testowego. Teraz musimy obliczyć wybraną
 miarę skuteczności. Jako przykład wybierzemy dokładność (*accuracy*) definiowaną
-jako iloraz poprawnych klasyfikacji do sumy poprawnych i niepoprawnych klasyfikacji.
+jako iloraz poprawnych klasyfikacji do wszystkich (poprawnych i niepoprawnych)
+klasyfikacji.
 
 ```{r}
-mean(test$klasa == pred)
+pop_klas = test$klasa == pred # zwraca wartość logiczną czy klasa jest prawidłowa
+sum(pop_klas) / length(pop_klas)
 ```
 
 Skuteczność naszego modelu wynosi około 71%. Oprócz jednej ogólnej statystyki
