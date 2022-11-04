@@ -5,7 +5,7 @@ output:
   html_document:
     toc: yes
     toc_float: true
-date: 02.12.2022 r.
+date: 2022-12-02
 ---
 
 ## Wczytanie danych
@@ -13,7 +13,7 @@ date: 02.12.2022 r.
 Procedura wczytania danych wygląda identycznie tak jak w poprzednim przypadku.
 
 ```{r message=FALSE}
-library("terra")
+library(terra)
 ```
 
 ```{r}
@@ -26,12 +26,11 @@ names(landsat) = paste0("B", 1:7)
 poly = vect("dane/powiat_sremski.gpkg")
 ```
 
-Jednak tym razem dodatkowo wczytamy raster z klasami pokrycia terenu
-([Sentinel-2 Global Land Cover](https://s2glc.cbk.waw.pl/)).
+Jednak tym razem dodatkowo wczytamy raster z klasami pokrycia terenu ([Sentinel-2 Global Land Cover](https://s2glc.cbk.waw.pl/)).
 
 ```{r}
 cat = rast("dane/S2GLC_T33UXT.tif")
-cat
+plot(cat, type = "classes")
 ```
 
 Oprócz tego, wczytajmy jeszcze legendę, która znajduje się w pliku `S2GLC_T33UXT.csv`.
@@ -48,29 +47,29 @@ zapisie szesnastkowym, w trzeciej nazwa klasy.
 ## Operacje na rastrach
 
 Jak można zauważyć, nasze rastry różnią się rozdzielczością przestrzenną (scena 
-Landsat ma 30 m, natomiast klasy pokrycia terenu 10 m). Kiedy rastry posiadają
-różne rozdzielczości, to nie jest możliwe wykonywanie na nich operacji matematycznych.
-W takim przypadku musimy sprowadzić je do jednakowej rozdzielczości. Z racji iż
-proste metody przepróbkowania nie zwiększają ilości informacji przy upscalingu,
-to lepiej wykonać przepróbkowanie do niższej rozdzielczości.
+Landsat ma 30 m, natomiast klasy pokrycia terenu 10 m).
+Kiedy rastry posiadają różne rozdzielczości nie jest możliwe wykonywanie na nich operacji matematycznych.
+W takim przypadku musimy sprowadzić je do jednakowej rozdzielczości.
+Z racji iż proste metody przepróbkowania (*resampling*) nie zwiększają ilości informacji przy upscalingu, to lepiej wykonać przepróbkowanie do niższej rozdzielczości.
+<!--JN: powyższe zdanie trzeba przepisać i trochę wyjaśnić-->
 
-Przepróbkowanie (*resampling*) można wykonać przy pomocy funkcji `resample()`.
-Dostępne są różne metody przepróbkowania, ale w przypadku danych kategorycznych,
-koniecznie trzeba wykorzystać algorytm najbliższego sąsiada (`method = "near"`).
+Przepróbkowanie można wykonać przy pomocy funkcji `resample()`.
+Dostępne są różne metody przepróbkowania, ale w przypadku danych kategorycznych, koniecznie trzeba wykorzystać algorytm najbliższego sąsiada (`method = "near"`).
+<!-- JN: `mode` czy `med` też powinna zadziałać-->
 Jeśli tego nie zrobimy, to ID kategorii zostaną zmienione.
 
 ```{r}
-cat = resample(cat, landsat, "near")
+cat = resample(cat, landsat, method = "near")
 res(cat) # wyświetl rozdzielczość po przepróbkowaniu
 ```
 
-Kolejne operacje (czyli przycinanie, maskowanie i skalowanie) przebiegają tak jak
-w poprzednim przykładzie.
+Kolejne operacje (czyli przycinanie, maskowanie i skalowanie) przebiegają tak jak w poprzednim przykładzie.
 
 ```{r}
+# przycinanie, maskowanie
 landsat = crop(landsat, poly, mask = TRUE)
 cat = crop(cat, poly, mask = TRUE)
-
+# skalowanie
 landsat = landsat * 2.75e-05 - 0.2
 landsat[landsat < 0] = NA
 landsat[landsat > 1] = NA
@@ -78,11 +77,10 @@ landsat[landsat > 1] = NA
 
 ## Przygotowanie danych
 
-Teraz przygotujmy nasze dane do klasyfikacji. Tym razem jako model użyjemy [drzewo
-decyzyjne](https://www.statsoft.pl/textbook/stclatre.html), które wymaga danych
-w postaci ramki danych (*data frame*). Jedna kolumna to zmienna modelowana/zależna
-(u nas klasy pokrycia terenu), a pozostałe kolumny to zmienne wyjaśniające/niezależne
-(kanały spektralne).
+Teraz przygotujmy nasze dane do klasyfikacji. 
+Tym razem użyjemy modelu [drzewa decyzyjnego](https://www.statsoft.pl/textbook/stclatre.html), które wymaga danych w postaci ramki danych (*data frame*).
+Jedna kolumna to zmienna modelowana/zależna (u nas klasy pokrycia terenu), a pozostałe kolumny to zmienne wyjaśniające/niezależne (kanały spektralne).
+<!--JN: może gdzieś na wstępie warto byłoby wyjaśnić różnice między klasyfikacją nienadzorowaną a nadzorowaną: czym się różnią, po co są, etc.-->
 
 ```{r}
 data = cbind(values(cat), values(landsat)) # połączenie kolumn w macierzy
@@ -91,8 +89,8 @@ data = na.omit(data) # usunięcie brakujących wartości
 ```
 
 Jedna z klas w zbiorze danych to chmury, które zostały sklasyfikowane podczas
-tworzenia mapy z klasami pokrycia terenu. Wiadomo, że zachmurzenie jest zmienne
-w czasie, dlatego powinniśmy usunąć tę klasę (`ID = 0`).
+tworzenia mapy z klasami pokrycia terenu. 
+Wiadomo, że zachmurzenie jest zmienne w czasie, dlatego powinniśmy usunąć tę klasę (`ID = 0`).
 
 ```{r}
 # usuń piksele reprezentujące klasę chmury
@@ -100,7 +98,7 @@ w czasie, dlatego powinniśmy usunąć tę klasę (`ID = 0`).
 data = data[!data$S2GLC_T33UXT == 0, ]
 ```
 
-W celu ułatwienia analizy danych, możemy ID klasy zamienić na nazwę.
+W celu ułatwienia analizy danych, możemy zamienić ID klasy na nazwę.
 Dopasowanie nazw klas do ID można wykonać za pomocą funkcji `merge()`.
 Dodatkowo, zmieńmy jeszcze nazwę kolumny z `S2GLC_T33UXT` na `klasa`.
 
@@ -117,16 +115,12 @@ Dane wejściowe wyglądają teraz następująco.
 head(data)
 ```
 
-Przed klasyfikacją warto sprawdzić rozkład kategorii, tj. jak często pojawiają
-się poszczególne kategorie. Jeśli część kategorii pojawia się bardzo często,
-a niektóre prawie wcale, to wtedy mamy problem z niezbalansowanym zbiorem danych.
-W takiej sytuacji, kiedy model posiada zbyt mało przykładów którejś klasy (np. bagna),
-to nie jest możliwe żeby nauczył się rozpoznawać tę klasę. Oprócz tego, wynik
-jakości klasyfikatora jest zbyt optymistyczny (tzn. w rzeczywistości działa gorzej
-niż na zbiorze uczącym).
+Przed klasyfikacją warto sprawdzić częstości kategorii, tj. jak często pojawiają się poszczególne kategorie.
+Jeśli część kategorii pojawia się bardzo często, a niektóre prawie wcale, to wtedy mamy problem z niezbalansowanym zbiorem danych.
+W takiej sytuacji, kiedy model posiada zbyt mało przykładów którejś klasy (np. bagna), to nie jest możliwe żeby nauczył się rozpoznawać tę klasę.
+Oprócz tego, wynik jakości klasyfikatora jest zbyt optymistyczny (tzn. w rzeczywistości działa gorzej niż na zbiorze uczącym).
 
-Częstość występowania klas można sprawdzić za pomocą funkcji `table()` na kolumnie
-kategorycznej i następnie zamienić to na postać procentową używając `prop.table()`.
+Częstość występowania klas można sprawdzić za pomocą funkcji `table()` na kolumnie kategorycznej i następnie zamienić to na postać procentową używając `prop.table()`.
 
 ```{r}
 tabela = table(data$klasa)
@@ -137,17 +131,17 @@ prop.table(tabela) * 100
 
 ```{r}
 # install.packages(c("rpart", "rpart.plot"))
-library("rpart") # model klasyfikacyjny
-library("rpart.plot") # wizualizacja modelu
+library(rpart) # model klasyfikacyjny
+library(rpart.plot) # wizualizacja modelu
 ```
 
-Każdy opracowany model powinien zostać zwalidowany na niezależnym zbiorze danych.
+Każdy opracowany model powinien zostać poddany walidacji na niezależnym zbiorze danych.
 Oznacza to, że powinniśmy sprawdzić skuteczność naszego modelu na innym zbiorze
-danych, który nie został wykorzystany na etapie modelowania (uczenia). Istnieje
-kilka metod walidacji, ale wykorzystamy najprostszą polegającą na podziale
-wejściowego zbioru danych na treningowy oraz testowy. Proporcja między tymi dwoma
-zestawami powinna wynosić około 70-80% do 30-20%. Tak jak poprzednio musimy
-wylosować próbę o ustalonej wielkości używając funkcji `sample()`.
+danych, który nie został wykorzystany na etapie modelowania (uczenia).
+Istnieje wiele metod walidacji, ale wykorzystamy tutaj najprostszą polegającą na podziale wejściowego zbioru danych na treningowy oraz testowy. 
+Proporcja między tymi dwoma zestawami powinna wynosić około 70-80% do 30-20%.
+<!--JN: dlaczego tyle powinna wynosić? -->
+Tak jak poprzednio musimy wylosować próbę o ustalonej wielkości używając funkcji `sample()`.
 
 ```{r}
 # podział na zbiór treningowy i testowy
@@ -158,9 +152,8 @@ train = data[trainIndex, ] # wybierz próbki treningowe
 test = data[-trainIndex, ] # wybierz próbki testowe (nietreningowe)
 ```
 
-Po tej czynności dochodzimy do najważniejszego etapu, czyli trenowania modelu
-klasyfikacyjnego. W tym celu wykorzystamy funkcję `rpart()`, która wymaga
-zdefiniowania:
+Po tej czynności dochodzimy do najważniejszego etapu, czyli trenowania modelu klasyfikacyjnego. 
+W tym celu wykorzystamy funkcję `rpart()`, która wymaga zdefiniowania:
 
 1. Zmiennej zależnej i zmiennych zależnych za pomocą odpowiedniej formuły.
 2. Zbioru danych treningowych (`data = train`).
@@ -169,28 +162,29 @@ zdefiniowania:
 Odnośnie punkty pierwszego, formułę można zdefiniować na dwa sposoby:
 
 1. Używając nazw poszczególnych zmiennych: `klasa ~ B1 + B2 + B3 + B4 + B5 + B6 + B7`.
-2. Używając kropki: `klasa ~ .`. Kropka zastępuje wszystkie nazwy zmiennych
-wyjaśniających z ramki danych.
+2. Używając kropki: `klasa ~ .`. Kropka zastępuje wszystkie nazwy zmiennych wyjaśniających z ramki danych.
 
-Znak `~` (tylda) oznacza "jest zależne od", czyli *klasa pokrycia terenu jest
-zależna od kanałów B1 do B7*.
+Znak `~` (tylda) oznacza "jest zależne od", czyli *klasa pokrycia terenu jest zależna od kanałów B1 do B7*.
 
 ```{r}
 mdl = rpart(klasa ~ ., data = train, method = "class")
 ```
 
-Po zakończeniu tej operacji możemy sprawdzić jakich reguł klasyfikacyjnych
-nauczył się model. Drzewo decyzyjne można zwizualizować za pomocą funkcji `prp()`.
+Po zakończeniu tej operacji możemy sprawdzić jakich reguł klasyfikacyjnych nauczył się model.
+Drzewo decyzyjne można zwizualizować za pomocą funkcji `prp()`.
 
 ```{r}
 prp(mdl)
 ```
 
-Kluczowym etapem modelowania jest walidacja modelu. Sprawdźmy zatem jaka jest
-jego skuteczność. W tym celu musimy wykonać predykcję dla zbioru testowego
-(funkcja `predict()`). Zbiór danych testowych musi posiadać dokładnie te same
-zmienne wyjaśniające co zbiór treningowy. Kolumnę z prawdziwymi (rzeczywistymi)
-klasami należy usunąć.
+<!--JN: wyjaśnij te wyniki-->
+
+Kluczowym etapem modelowania jest walidacja modelu. 
+Sprawdźmy zatem jaka jest jego skuteczność. 
+<!-- JN: co oznacza "skuteczność"?-->
+W tym celu musimy wykonać predykcję dla zbioru testowego (funkcja `predict()`).
+Zbiór danych testowych musi posiadać dokładnie te same zmienne wyjaśniające co zbiór treningowy. 
+Kolumnę z prawdziwymi (rzeczywistymi) klasami należy usunąć.
 
 ```{r}
 # walidacja dla zbioru testowego
@@ -198,55 +192,49 @@ pred = predict(mdl, test[, -8], type = "class")
 unname(head(pred)) # `unname()` usuwa numer porządkowy wiersza/piksela
 ```
 
-Wykonaliśmy predykcje dla zbioru testowego. Teraz musimy obliczyć wybraną
-miarę skuteczności. Jako przykład wybierzemy dokładność (*accuracy*) definiowaną
-jako iloraz poprawnych klasyfikacji do wszystkich (poprawnych i niepoprawnych)
-klasyfikacji.
+Wykonaliśmy predykcje dla zbioru testowego. 
+Teraz musimy obliczyć wybraną miarę skuteczności.
+Jako przykład wybierzemy dokładność (*accuracy*) definiowaną jako iloraz poprawnych klasyfikacji do wszystkich (poprawnych i niepoprawnych) klasyfikacji.
 
 ```{r}
 pop_klas = test$klasa == pred # zwraca wartość logiczną czy klasa jest prawidłowa
 sum(pop_klas) / length(pop_klas)
 ```
 
-Skuteczność naszego modelu wynosi około 71%. Oprócz jednej ogólnej statystyki
-możemy sprawdzić również błędy klasyfikacji dla poszczególnych klas. Takie
-zestawienie nazywane jest tabelą pomyłek (*confusion matrix*).
+Skuteczność naszego modelu wynosi około 71%. 
+Oprócz jednej ogólnej statystyki możemy sprawdzić również błędy klasyfikacji dla poszczególnych klas. Takie zestawienie nazywane jest tabelą pomyłek (*confusion matrix*).
 
 ```{r}
 table(pred = pred, true = test$klasa)
 ```
 
-Poprawnie sklasyfikowane obiekty znajdują się na przekątnej. Obiekty sklasyfikowane
-jako fałszywe pozytywne (*false positive*) znajdują się w prawej górnej części,
-natomiast obiekty sklasyfikowane jako fałszywe negatywne (*false negative*) w
-lewej dolnej części.
+Poprawnie sklasyfikowane obiekty znajdują się na przekątnej.
+Obiekty sklasyfikowane jako fałszywe pozytywne (*false positive*) znajdują się w prawej górnej części, natomiast obiekty sklasyfikowane jako fałszywe negatywne (*false negative*) w lewej dolnej części.
 
-Jeśli opracowany model spełnia nasze oczekiwania, to możemy wykorzystać go do
-predykcji na całym obszarze. Ponownie wykorzystamy funkcję `predict()`, ale tym
-razem jako dane wejściowe użyjemy nasz raster `landsat`. Dodatkowo, powinniśmy
-ustawić argument `na.rm = TRUE`, aby uniknąć predykcji poza obszarem analizy.
+Jeśli opracowany model spełnia nasze oczekiwania, to możemy wykorzystać go do predykcji na całym obszarze.
+Ponownie wykorzystamy funkcję `predict()`, ale tym razem jako dane wejściowe użyjemy nasz raster `landsat`.
+Dodatkowo, powinniśmy ustawić argument `na.rm = TRUE`, aby uniknąć predykcji poza obszarem analizy.
 
 ```{r}
 pred_map = predict(landsat, mdl, type = "class", na.rm = TRUE)
 ```
 
 Jako wynik powyższej operacji otrzymaliśmy mapę z predykcją klas pokrycia terenu.
-Teraz możemy dokonać wizualizacji. Tak jak w poprzednich przykładach wykorzystamy
-funkcję `plot()`. Jednak tym razem musimy wykorzystać odpowiedni schemat kolorów,
-który znajduje się w obiekcie `leg`. Tą operację należy wykonać w dwóch krokach:
+Teraz możemy dokonać wizualizacji wykorzystując funkcję `plot()`. 
+Jednak tym razem musimy użyć odpowiedniego schemat kolorów, który znajduje się w obiekcie `leg`.
+Tę operację należy wykonać w dwóch krokach:
 
 1. Sprawdzić, które klasy rzeczywiście występują na naszym obszarze.
 2. Dopasować kolory do odpowiednich klas.
 
-Odnośnie punkty pierwszego, to najprościej wykorzystać funkcję `droplevels()`,
-która usunie puste kategorie z rastra (np. winnica, wrzosowisko). Następnie
-należy wyświetlić kategorie za pomocą funkcji `levels()`. Do każdej warstwy rastra
-mogą być przypisane różne kategorie, więc musimy pobrać je tylko dla pierwszej
-warstwy oraz wskazać atrybut `class`.
+Odnośnie pierwszego punktu, to najprościej wykorzystać funkcję `droplevels()`, która usunie puste kategorie z rastra (np. winnica, wrzosowisko). 
+Następnie należy wyświetlić kategorie za pomocą funkcji `levels()`. 
+Do każdej warstwy rastra mogą być przypisane różne kategorie, więc musimy pobrać je tylko dla pierwszej warstwy oraz wskazać atrybut `class`.
 
-Dopasowania kolorów można dokonać za pomocą funkcji `match()`. Jako pierwszy
-wskazujemy obiekt z naszymi klasami, jako drugi obiekt ramkę danych ze schematem
-kolorów (`leg`) i w wyniku otrzymamy dopasowane indeksy kolorów.
+Dopasowania kolorów można dokonać za pomocą funkcji `match()`. 
+Jako pierwszy wskazujemy obiekt z naszymi klasami, jako drugi obiekt ramkę danych ze schematem kolorów (`leg`) i w wyniku otrzymamy dopasowane indeksy kolorów.
+
+<!--JN: ta pierwsza linia kodu poniżej może być trudna do zrozumienia: czy da się to prościej rozpisać?-->
 
 ```{r}
 lv = levels(droplevels(pred_map))[[1]][["class"]]
@@ -254,8 +242,7 @@ col_idx = match(lv, leg$Klasa)
 plot(pred_map, main = "Predykcja klas", col = leg$RGB[col_idx])
 ```
 
-W przypadku, gdy raster posiada oryginalne ID klas (tj. 0, 62, 73, 75, itd.),
-to możemy po prostu przypisać ramkę danych do rastra.
+W przypadku, gdy raster posiada oryginalne ID klas (tj. 0, 62, 73, 75, itd.) to możemy po prostu przypisać ramkę danych do rastra.
 
 ```{r}
 levels(cat) = leg[, c(1, 3)]

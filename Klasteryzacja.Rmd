@@ -5,30 +5,28 @@ output:
   html_document:
     toc: yes
     toc_float: true
-date: 02.12.2022 r.
+date: 2022-12-02
 ---
 
 ## Wczytanie danych
 
 ```{r message=FALSE}
 # wczytanie pakietu
-library("terra")
+library(terra)
 ```
 
-W pierwszym kroku musimy wylistować dane (rastry), które zamierzamy wczytać.
-W tym celu możemy wykorzystać funkcję `list.files()`, która jako argument przyjmuje
-ścieżkę do folderu z plikami. Oprócz tego musimy wskazać jaki rodzaj plików chcemy
-wczytać (`pattern = "\\.TIF$"`) oraz zwrócić pełne ścieżki do plików
+W pierwszym kroku musimy stworzyć listę danych (rastrów), które zamierzamy wczytać.
+W tym celu możemy wykorzystać funkcję `list.files()`, która jako argument przyjmuje ścieżkę do folderu z plikami. 
+Oprócz tego musimy wskazać jaki rodzaj plików chcemy wczytać (`pattern = "\\.TIF$"`) oraz zwrócić pełne ścieżki do plików
 (`full.names = TRUE`).
 
 ```{r}
-# listowanie plikóW z katalogu
+# listowanie plików z katalogu
 files = list.files("dane/landsat", pattern = "\\.TIF$", full.names = TRUE)
 files
 ```
 
-Kiedy utworzyliśmy już listę plików, możemy je wczytać przy pomocy
-funkcji `rast()` z pakietu **terra** i następnie wyświetlić metadane.
+Kiedy utworzyliśmy już listę plików, możemy je wczytać przy pomocy funkcji `rast()` z pakietu **terra** i następnie wyświetlić metadane.
 
 ```{r}
 # wczytanie danych rastrowych
@@ -36,8 +34,8 @@ landsat = rast(files)
 landsat # odwołanie się do obiektu wyświetla metadane
 ```
 
-Możemy również skrócić lub zmienić nazwy kanałów spektralnych. Przed tą operacją
-należy się upewnić czy kanały zostały wczytane w prawidłowej kolejności.
+Możemy również skrócić lub zmienić nazwy kanałów spektralnych.
+Przed tą operacją należy się upewnić czy kanały zostały wczytane w prawidłowej kolejności.
 
 ```{r}
 names(landsat) # nazwy oryginalne
@@ -57,21 +55,19 @@ poly = vect("dane/powiat_sremski.gpkg")
 poly
 ```
 
-Teraz możemy przygotować prostą wizualizację jednego kanału (np. ultra blue; B1)
-oraz poligonu.
+Teraz możemy przygotować prostą wizualizację jednego kanału (np. NIR; B5) oraz poligonu.
 
 ```{r}
 # wizualizacja
-plot(landsat[[1]]) # alternatywnie: plot(landsat[["B1"]])
+plot(landsat[[5]]) # alternatywnie: plot(landsat[["B5"]])
 plot(poly, add = TRUE)
 ```
 
 ## Operacje na rastrach
 
-Zasięg naszego obszaru analizy ograniczony jest do powiatu śremskiego, natomiast
-scena satelitarna ma o wiele większy zasięg. W takiej sytuacji możemy dociąć rastry,
-dzięki czemu przetwarzanie będzie szybsze, a finalna mapa zajmie mniej miejsca
-na dysku. Do docinania rastrów służy funkcja `crop()` i jako argumenty musimy podać
+Zasięg naszego obszaru analizy ograniczony jest do powiatu śremskiego, natomiast scena satelitarna ma o wiele większy zasięg.
+W takiej sytuacji możemy dociąć rastry, dzięki czemu dalsze ich przetwarzanie będzie szybsze, a efekt obliczeń zajmie mniej miejsca na dysku.
+Do docinania rastrów służy funkcja `crop()` i jako argumenty musimy podać
 raster oraz wektor.
 
 ```{r}
@@ -80,11 +76,11 @@ plot(landsat[[1]])
 plot(poly, add = TRUE)
 ```
 
-Obszar rastra zmniejszył się. Jednak możemy zauważyć, że poza poligonem wartości
-nie zostały usunięte. Wynika to z faktu, że obraz zawsze docinany jest do obwiedni
-(*bounding box*), a wartości poza obiektem/poligonem w rzeczywistości są maskowane
-(tj. są oznaczane jako brakujące wartości). Aby zamaskować piksele poza poligonem
-należy użyć funkcji `mask()`.
+Obszar rastra zmniejszył się. 
+Jednak możemy zauważyć, że poza poligonem wartości nie zostały usunięte. 
+Wynika to z faktu, że obraz zawsze docinany jest do obwiedni
+(*bounding box*), a wartości poza obiektem/poligonem w rzeczywistości są maskowane (tj. są oznaczane jako brakujące wartości). 
+Aby zamaskować piksele poza poligonem należy użyć funkcji `mask()`.
 
 ```{r}
 landsat = mask(landsat, poly)
@@ -92,29 +88,26 @@ plot(landsat[[1]])
 plot(poly, add = TRUE)
 ```
 
-Tą operację można przeprowadzić również w jednej linii kodu używając argumentu
-`mask = TRUE` w funkcji `crop()`.
+Tą operację można przeprowadzić również w jednej linii kodu używając argumentu `mask = TRUE` w funkcji `crop()`.
 
 ```{r eval=FALSE}
 crop(landsat, poly, mask = TRUE)
 ```
 
-W następnym kroku możemy w prosty sposób sprawdzić statystyki opisowe naszego
-zbioru danych.
+W następnym kroku możemy w prosty sposób sprawdzić statystyki opisowe naszego zbioru danych.
 
 ```{r warning=FALSE}
 summary(landsat)
 ```
 
-Jak możemy zauważyć wartości odbicia spektralnego dla naszego zbioru danych są
-w zakresie od kilku do kilkunastu tysięcy dla każdego kanału. Z definicji odbicie
-spektralne jest w przedziale od 0 do 1. Takie dane musimy przeskalować za pomocą
-poniższego równania:
+Jak możemy zauważyć wartości odbicia spektralnego dla naszego zbioru danych są w zakresie od kilku do kilkunastu tysięcy dla każdego kanału. 
+Odbicie spektralne powinno być w przedziale od 0 do 1, w związku z czym nasze dane musimy przeskalować za pomocą poniższego równania:
 
 $$x = x \cdot 0.0000275 - 0.2$$
 
-Nie ma potrzeby stosowania tego wzoru osobno dla każdego kanału w pętli, ponieważ
-domyślnie operacje matematyczne są stosowane dla wszystkich kanałów.
+<!--JN: wyjaśnij to równanie -->
+
+Nie ma potrzeby stosowania tego wzoru osobno dla każdego kanału w pętli, ponieważ operacje matematyczne w pakiecie **terra** są domyślnie stosowane dla wszystkich kanałów.
 
 ```{r warning=FALSE}
 landsat = landsat * 2.75e-05 - 0.2
@@ -125,11 +118,12 @@ Nadal możemy zauważyć, że pewne wartości przekraczają nasz zakres od 0 do 
 Są to wartości odstające, które zazwyczaj związane są z błędnym pomiarem lub
 nadmierną saturacją. Można ten problem rozwiązać na dwa sposoby:
 
-1. Zastąpić te wartości brakiem danych (NA).
+1. Zastąpić te wartości brakiem danych (`NA`).
 2. Dociąć do minimalnej i maksymalnej wartości.
 
 Pierwszy sposób może spowodować, że stracimy dużą część zbioru danych.
 Natomiast drugi sposób może powodować przekłamania.
+<!--JN: wyjaśnij więcej te konsekwencje i wytłumacz dlaczego wybrałeś pierwszy sposób-->
 
 ```{r}
 # sposób nr 1
@@ -143,14 +137,13 @@ landsat[landsat < 0] = 0
 landsat[landsat > 1] = 1
 ```
 
-Po przeskalowaniu wartości możemy wyświetlić kompozycję RGB. W tym przypadku
-zamiast funkcji `plot()` należy użyć funkcji `plotRGB()` oraz zdefiniować 
-kolejność kanałów czerwonego, zielonego oraz niebieskiego. Oprócz tego,
-należy podać maksymalną wartość odbicia dla kanałów (w naszym przypadku `scale = 1`).
-Często zdarza się, że kompozycje są zbyt ciemne/jasne, wtedy warto zastosować
-rozciągnięcie kolorów używając argumentu `stretch = "lin"` lub `stretch = "hist"`.
+Po przeskalowaniu wartości możemy wyświetlić kompozycję RGB.
+W tym przypadku zamiast funkcji `plot()` należy użyć funkcji `plotRGB()` oraz zdefiniować kolejność kanałów czerwonego, zielonego oraz niebieskiego.
+Oprócz tego należy podać maksymalną wartość odbicia dla kanałów (w naszym przypadku `scale = 1`).
+Często zdarza się, że kompozycje są zbyt ciemne/jasne, wtedy warto zastosować rozciągnięcie kolorów używając argumentu `stretch = "lin"` lub `stretch = "hist"`.
 
 ```{r}
+# plotRGB(landsat, r = 4, g = 3, b = 2, scale = 1)
 plotRGB(landsat, r = 4, g = 3, b = 2, scale = 1, stretch = "lin")
 ```
 
@@ -158,12 +151,14 @@ plotRGB(landsat, r = 4, g = 3, b = 2, scale = 1, stretch = "lin")
 
 ```{r}
 # wczytanie pakietu do klasteryzacji
-library("cluster")
+library(cluster)
 ```
 
 Modele do klasteryzacji (oraz klasyfikacji nadzorowanej) wymagają macierzy 
-lub ramki danych. Zatem dane do treningu musimy przygotować w odpowiedni sposób.
-Raster można sprowadzić do macierzy przy użyciu funkcji `values()`.
+lub ramki danych.
+<!-- JN: powyższe zdanie nie jest po polsku-->
+Zatem dane do treningu musimy przygotować w odpowiedni sposób.
+Dane rastrowe można przetworzyć do macierzy przy użyciu funkcji `values()`.
 
 ```{r}
 mat = values(landsat)
@@ -171,9 +166,15 @@ nrow(mat) # wyświetla liczbę wierszy
 ```
 
 Za pomocą funkcji `View()` możemy sprawdzić jak wygląda nasza macierz.
-Jak łatwo można zauważyć, mnóstwo jej wartości oznaczonych jest jako brak danych
-(głównie są to wartości poza obszarem analizy). Zazwyczaj modele nie obsługują
-NA, więc musimy je usunąć. Służy do tego dedykowana funkcja `na.omit()`.
+
+```{r, eval=FALSE}
+View(mat)
+```
+
+Jak można zauważyć, mnóstwo jej wartości oznaczonych jest jako brak danych (głównie są to wartości poza obszarem analizy).
+Zazwyczaj modele nie obsługują `NA`, więc musimy je usunąć.
+<!--JN: musisz wcześniej zdefiniować co rozumiesz przez "modele"-->
+Służy do tego dedykowana funkcja `na.omit()`.
 
 ```{r}
 mat_omit = na.omit(mat)
@@ -181,18 +182,19 @@ nrow(mat_omit)
 ```
 
 Teraz przejdziemy do najważniejszego etapu analizy, czyli do wytrenowania modelu.
-Użyjemy najprostszego modelu [grupowania k-średnich](https://www.statsoft.pl/textbook/stcluan.html#k)
-(*k-means*). Ten model wymaga jedynie, aby podać z góry liczbę klastrów/grup
-(argument `centers`). Jest to algorytm stochastyczny, więc za każdym razem
-zwraca inne wyniki. Żeby analiza była powtarzalna musimy ustawić ziarno
-losowości -- `set.seed()`.
+Użyjemy prostego modelu [grupowania metodą k-średnich](https://www.statsoft.pl/textbook/stcluan.html#k) (*k-means*).
+Ten model wymaga jedynie, aby podać z góry liczbę klastrów/grup
+(argument `centers`).
+Jest to algorytm stochastyczny, więc za każdym razem zwraca inne wyniki.
+Żeby analiza była powtarzalna musimy ustawić ziarno losowości -- `set.seed()`.
+<!--JN: nie trzeba tutaj tego pisać, ale warto wytłumaczyć te dwie kwestie: stochastyczność oraz ziarno losowe-->
 
 ```{r}
 set.seed(1)
 mdl = kmeans(mat_omit, centers = 5)
 ```
 
-W wyniku powyższej operacji otrzymaliśmy m. in.:
+W wyniku powyższej operacji otrzymaliśmy m.in.:
 
 1. Obliczone średnie wartości klastrów dla poszczególnych kanałów (`mdl$centers`).
 2. Wektor ze sklasyfikowanymi wartościami macierzy (`mdl$cluster`).
@@ -207,28 +209,27 @@ mdl$centers
 head(mdl$cluster) # wyświetla pierwsze 6 elementów
 ```
 
-Oznacza to, że pierwszy wiersz (piksel) należy do grupy 3, drugi do grupy 2,
-trzeci do grupy 2, itd. Kolejnym etapem jest stworzenie mapy na podstawie
-otrzymanego wektora z klastrami.
+Oznacza to, że pierwszy wiersz (reprezentujący pojedyncze oczko siatki) należy do grupy 3, drugi do grupy 2, trzeci do grupy 2, itd.
+Kolejnym etapem jest stworzenie mapy na podstawie otrzymanego wektora z klastrami.
 
 Na początku musimy przygotować pusty wektor składający się z całkowitej liczby
-pikseli rastra. Można to sprawdzić za pomocą funkcji `ncell()`. W naszym
+pikseli rastra. Można to sprawdzić za pomocą funkcji `ncell()`.
+W naszym
 przypadku jest to 1 238 760.
 
 ```{r}
 vec = rep(NA, ncell(landsat)) # przygotuj pusty wektor
 ```
 
-Następnie musimy przypisać nasze klastry w wektorze w odpowiednie miejsca,
-tj. tym, które nie są zamaskowane (NA). Do niezamaskowanych
-wartości można odwołać się przez funkcję `complete.cases()`. 
+Następnie musimy przypisać nasze klastry w wektorze w odpowiednie miejsca, tj. tym, które nie są zamaskowane (`NA`).
+Do niezamaskowanych wartości można odwołać się przez funkcję `complete.cases()`. 
 
 ```{r}
 # zastąp tylko te wartości, które nie są NA
 vec[complete.cases(mat)] = mdl$cluster 
 ```
 
-W ostatnim kroku skopiujemy metadane obiektu `landsat`, ale tylko z jedną
+W ostatnim kroku kopiujemy metadane obiektu `landsat`, ale tylko z jedną
 warstwą i przypiszemy mu wartości wektora `vec`.
 
 ```{r}
@@ -236,6 +237,7 @@ clustering = rast(landsat, nlyrs = 1, vals = vec)
 ```
 
 Sprawdźmy teraz jak wygląda klasteryzacja naszego obszaru na mapie.
+<!-- JN: kolejny blok kodu to duży skok myślowy: musisz wytłumaczyć (albo nawet pokazać) w jaki sposób przeszedłeś z klastrów na kategorie pokrycia terenu! -->
 
 ```{r}
 colors = c("#086209", "#fdd327", "#d9d9d9", "#29a329", "#91632b")
@@ -243,8 +245,9 @@ category = c("lasy/woda", "pola uprawne", "odkryta gleba", "roślinność", "nie
 plot(clustering, col = colors, type = "classes", levels = category)
 ```
 
-Jeśli wynik jest satysfakcjonujący, to możemy go zapisać używając funkcji
-`writeRaster()` i wczytać w innym programie.
+Jeśli wynik jest satysfakcjonujący to możemy go zapisać używając funkcji
+`writeRaster()`.
+Taki plik można później wczytać w R lub innym programie obsługującym dane przestrzenne (np. QGIS).
 
 ```{r eval=FALSE}
 writeRaster(clustering, "clustering.tif")
@@ -253,27 +256,26 @@ writeRaster(clustering, "clustering.tif")
 ## Wizualizacje
 
 Do analizy właściwości klastrów, zamiast statystyk opisowych, mogą zostać
-wykorzystane wizualizacje. Największe możliwości dostarcza pakiet **ggplot2**.
+wykorzystane wizualizacje.
+Największe możliwości dostarcza pakiet **ggplot2**.
 Tutaj można znaleźć darmowy [podręcznik](https://ggplot2-book.org/)
 oraz gotowe ["przepisy"](https://r-graphics.org/).
 
 **ggplot2** wymaga przygotowania zbioru danych do odpowiedniej postaci.
-Dane muszą być przedstawione w tzw. formie długiej (wiele wierszy), podczas gdy
-standardowe funkcje do wizualizacji wymagają formy szerokiej (wiele kolumn).
+Dane muszą być przedstawione jako ramka danych w tzw. formie długiej (wiele wierszy), podczas gdy standardowe funkcje do wizualizacji wymagają formy szerokiej (wiele kolumn).
 Takiej zmiany można dokonać w prosty sposób używając pakietu **tidyr**.
 
 ```{r message=FALSE}
 # install.packages(c("tidyr", "ggplot2"))
-library("tidyr") # transformacja danych
-library("ggplot2") # wizualizacja danych
+library(tidyr) # transformacja danych
+library(ggplot2) # wizualizacja danych
 ```
 
-Nasz zbiór danych jest całkiem pokaźny (blisko 9 mln wartości).
-Nie ma potrzeby przedstawiania wszystkich danych na wykresie. Wymaga to więcej 
-RAM i znacząco wydłuża czas rysowania. Prawie identyczny efekt można uzyskać
-wykorzystując mniejszą próbkę danych. Jako przykład zobrazujmy jedynie
-10 000 wartości z każdego kanału spektralnego. Do stworzenia losowej próby
-służy funkcja `sample()`. W wyniku otrzymamy indeksy wylosowanych wierszy.
+Nasz zbiór danych jest całkiem pokaźny (blisko 9 mln wartości), nie ma potrzeby do przedstawiania wszystkich danych na wykresie. 
+Wymaga to więcej RAM i znacząco wydłuża czas rysowania. 
+Prawie identyczny efekt można uzyskać wykorzystując mniejszą próbkę danych.
+Jako przykład zobrazujmy jedynie 10 000 wartości z każdego kanału spektralnego. Do stworzenia losowej próby służy funkcja `sample()`.
+W wyniku otrzymamy indeksy wylosowanych wierszy.
 
 ```{r}
 idx = sample(1:nrow(mat_omit), size = 10000)
@@ -290,8 +292,9 @@ head(stats)
 ```
 
 Jak można zauważyć, powyższe dane mają formę szeroką (każdy kanał spektralny
-zapisany jest w osobnej kolumnie). Teraz musimy zmienić formę, w której otrzymamy
-dwie kolumn -- kanał oraz wartość. W tym celu wykorzystamy funkcję `pivot_longer()`.
+zapisany jest w osobnej kolumnie). 
+Teraz musimy zmienić formę, w której otrzymamy dwie kolumn -- kanał oraz wartość. 
+W tym celu wykorzystamy funkcję `pivot_longer()`.
 
 ```{r}
 stats = pivot_longer(stats, cols = 1:7, names_to = "band", values_to = "value")
@@ -299,23 +302,26 @@ stats = pivot_longer(stats, cols = 1:7, names_to = "band", values_to = "value")
 
 Dla formalności możemy jeszcze zmienić typ liczbowy danych (klastrów i kanałów)
 na kategoryczny.
+<!--JN: wyjaśnij co to znaczy-->
 
 ```{r}
 stats$cluster = as.factor(stats$cluster)
 stats$band = as.factor(stats$band)
 ```
 
-Struktura danych jest już przygotowana. Teraz stwórzmy prosty wykres pudełkowy.
+Struktura danych jest już przygotowana.
+Teraz stwórzmy prosty wykres pudełkowy.
 
 ```{r}
-ggplot(stats, aes(x = band, y = value, color = cluster)) +
+ggplot(stats, aes(x = band, y = value, fill = cluster)) +
   geom_boxplot()
 ```
 
-Zmieńmy kilka domyślnych parametrów żeby poprawić stylistykę ryciny.
+Zmieńmy kilka domyślnych parametrów, żeby poprawić stylistykę ryciny.
+<!--JN: "stylistyka" w języku polskim nie pasuje tutaj-->
 
 ```{r}
-ggplot(stats, aes(x = band, y = value, color = cluster)) +
+ggplot(stats, aes(x = band, y = value, fill = cluster)) +
   geom_boxplot(show.legend = FALSE) +
   scale_colour_manual(values = colors) +
   facet_wrap(vars(cluster)) +
@@ -323,6 +329,7 @@ ggplot(stats, aes(x = band, y = value, color = cluster)) +
   ylab("Odbicie") +
   theme_light()
 ```
+<!--JN: trzeba wyjaśnić ten wynik-->
 
 Zmieniając `facet_wrap(vars(cluster))` na `facet_wrap(vars(band))`, zamiast
 zestawienia kanałów w poszczególnych panelach, możemy zestawić klastry.

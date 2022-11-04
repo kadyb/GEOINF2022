@@ -1,23 +1,24 @@
 # Dane przestrzenne w uczeniu maszynowym
 
-To repozytorium zawiera materiały do warsztatu "**Dane przestrzenne w uczeniu maszynowym - środowisko R**" przeprowadzonego podczas konferencji [Geoinformacja: Nauka – Praktyka – Edukacja](https://geoinformacja20uam.pl/) (02.12.2022 r.).
+To repozytorium zawiera materiały do warsztatu "**Dane przestrzenne w uczeniu maszynowym - środowisko R**" przeprowadzonego podczas konferencji [Geoinformacja: Nauka – Praktyka – Edukacja](https://geoinformacja20uam.pl/) (2022-12-02).
 
-**R**, tuż obok **Pythona**, jest jednym z najbardziej popularnych języków programowania używanych do analizy danych.
+**R** jest jednym z najbardziej popularnych języków programowania używanych do analizy danych.
 **R** znalazł szczególne zastosowanie w takich dziedzinach jak ekologia, leśnictwo, hydrologia czy teledetekcja dzięki swojej prostocie, możliwości automatyzacji powtarzalnych zadań oraz ogromnemu wsparciu przez jego społeczność.
 **R** stanowi świetną alternatywę dla standardowych aplikacji GIS znacząco rozszerzając ich możliwość w kontekście statystycznej analizy danych i uczenia maszynowego.
 
 ## Wymagania
 
-Warsztat skierowany jest do osób, które posiadają podstawową wiedzę i doświadczenia w środowisku **R**.
+Warsztat skierowany jest do osób, które posiadają podstawową wiedzę i doświadczenie w środowisku **R**.
 Wymagana jest również podstawowa wiedza z zakresu GIS oraz teledetekcji satelitarnej.
 
-Jeśli jesteś osobą początkującą i chcesz rozszerzyć swoją wiedzę (lub przypomnieć) odnośnie środowiska **R**, to polecam bezpłatny kurs online "[Pogromcy Danych](http://pogromcydanych.icm.edu.pl/)" przygotowany przez Uniwersytet Warszawski.
+Jeśli jesteś osobą początkującą i chcesz rozszerzyć (lub odnowić) swoją wiedzę odnośnie środowiska **R**, to polecam bezpłatny kurs online "[Pogromcy Danych](http://pogromcydanych.icm.edu.pl/)" przygotowany przez Uniwersytet Warszawski.
 Dostępny jest również podręcznik w języku polskim: "[Elementarz programisty: Wstęp do programowania używając R](https://jakubnowosad.com/elp/)".
 
 Kolejne podręczniki (w języku angielskim) dotyczące przestrzennej analizy danych to:
-  - [**Spatial Data Science with R and “terra”**](https://rspatial.org/terra/)
-  - [Geocomputation with R](https://geocompr.robinlovelace.net/)
-  - [Spatial Data Science, with applications in R](https://r-spatial.org/book/)
+
+- [**Spatial Data Science with R and “terra”**](https://rspatial.org/terra/)
+- [Geocomputation with R](https://geocompr.robinlovelace.net/)
+- [Spatial Data Science, with applications in R](https://r-spatial.org/book/)
 
 ## Wstęp
 
@@ -54,11 +55,11 @@ Dokumentacje do tego pakietu znajdziesz tutaj: <https://rspatial.github.io/terra
 Niezbędne dane rastrowe (scena Landsat, klasyfikacja pokrycia terenu) oraz wektorowe znajdziesz na [Dysku Google](https://drive.google.com/file/d/1ZhKanbDEQXvPJHD76VlcHk1rucG4hss5/view).
 Po pobraniu dane należy rozpakować.
 
-Interaktywne zeszyty (.Rmd) oraz statyczne dokumenty (.html) znajdziesz w niniejszym repozytorium.
-
 1. [Klasyfikacja nienadzorowana](https://kadyb.github.io/GEOINF2022/Klasteryzacja.html)
 2. [Klasyfikacja nadzorowana](https://kadyb.github.io/GEOINF2022/Klasyfikacja.html)
 
+Interaktywne zeszyty (.Rmd) oraz statyczne dokumenty (.html) znajdziesz w repozytorium [https://github.com/kadyb/GEOINF2022](https://github.com/kadyb/GEOINF2022).
+
 ## Kontakt
 
-Jeśli masz jakieś pytania albo potrzebujesz pomocy, napisz do mnie: krzysztof.dyba@amu.edu.pl
+Jeśli masz jakieś pytania albo potrzebujesz pomocy, napisz do mnie pod adres krzysztof.dyba@amu.edu.pl.
