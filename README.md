@@ -52,7 +52,7 @@ Dokumentacje do tego pakietu znajdziesz tutaj: <https://rspatial.github.io/terra
 
 ## Materiały :triangular_flag_on_post:
 
-Niezbędne dane rastrowe (scena Landsat, klasyfikacja pokrycia terenu) oraz wektorowe znajdziesz na [Dysku Google](https://drive.google.com/file/d/1ZhKanbDEQXvPJHD76VlcHk1rucG4hss5/view).
+Niezbędne dane rastrowe (scena Landsat 8, klasyfikacja pokrycia terenu) oraz wektorowe znajdziesz na [Dysku Google](https://drive.google.com/file/d/1ZhKanbDEQXvPJHD76VlcHk1rucG4hss5/view).
 Po pobraniu dane należy rozpakować.
 
 Interaktywne zeszyty (*.Rmd*) oraz statyczne dokumenty (*.html*) możesz pobrać z repozytorium [https://github.com/kadyb/GEOINF2022](https://github.com/kadyb/GEOINF2022):
@@ -60,6 +60,9 @@ Interaktywne zeszyty (*.Rmd*) oraz statyczne dokumenty (*.html*) możesz pobrać
 1. [Klasyfikacja nienadzorowana](https://kadyb.github.io/GEOINF2022/Klasteryzacja.html)
 2. [Klasyfikacja nadzorowana](https://kadyb.github.io/GEOINF2022/Klasyfikacja.html)
 3. [Zadanie](https://kadyb.github.io/GEOINF2022/Zadanie.html)
+
+Opis kanałów spektralnych znajdziesz [tutaj](https://landsat.gsfc.nasa.gov/satellites/landsat-8/landsat-8-bands/).
+Informacje o klasach pokrycia terenu Sentinel-2 Global Land Cover (S2GLC) znajdziesz [tutaj](https://s2glc.cbk.waw.pl/extension).
 
 ## Kontakt
 
