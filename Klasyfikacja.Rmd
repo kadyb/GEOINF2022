@@ -101,7 +101,7 @@ landsat[landsat > 1] = NA
 ## Przygotowanie danych
 
 Teraz przygotujmy nasze dane do klasyfikacji. Tym razem użyjemy modelu [drzewa
-decyzyjnego](https://www.statsoft.pl/textbook/stclatre.html), które wymaga danych
+decyzyjnego](https://www.statsoft.pl/textbook/stclatre.html), który wymaga danych
 w postaci ramki danych (*data frame*). Jedna kolumna to zmienna modelowana/zależna
 (u nas klasy pokrycia terenu), a pozostałe kolumny to zmienne wyjaśniające/niezależne
 (kanały spektralne).
