@@ -295,3 +295,39 @@ col_idx = match(lv, leg$Klasa)
 plot(cat, col = leg$RGB[col_idx], main = "Rzeczywiste klasy")
 ```
 
+## Podsumowanie
+
+Niniejsze warsztaty stanowią jedynie zarys wykorzystania metod uczenia maszynowego
+do analizy danych przestrzennych. Oprócz problemu klasyfikacji możemy również
+rozwiązywać problemy z zakresu regresji, wykrywania anomalii, redukcji wymiarowości,
+itd., używając bardziej zaawansowanych modeli (np. lasy losowe, modele wzmacnianie,
+sieci neuronowe, uczenie głębokie).
+
+Co więcej, cała analiza może być bardziej zaawansowana. Przedstawione treści
+można rozwinąć o kolejne zagadnienia dotyczące:
+
+- automatycznego wyszukiwania i pobierania danych satelitarnych,
+- integracji różnych sensorów (satelity + drony),
+- przetwarzania danych w chmurze,
+- optymalizacji parametrów modeli,
+- innych metod walidacji wyników (w tym ujęciu przestrzennym),
+- oceny istotności zmiennych wyjaśniających.
+
+Należy podkreślić, że zdjęcia satelitarne to nie jest jedyne źródło danych
+przestrzennych i do analizy można wykorzystać zupełnie inne dane, np.
+cyfrowe modele wysokościowe czy zasięgi występowania gatunków.
+
+Jeśli zainteresowałeś się tym tematem, to jego rozwinięcie znajdziesz w poniższych
+podręcznikach (W j. angielskim):
+
+- [**Spatial Data Science with R and “terra”**](https://rspatial.org/terra/)
+- [Geocomputation with R](https://geocompr.robinlovelace.net/)
+- [Spatial Data Science, with applications in R](https://r-spatial.org/book/)
+
+Warto również sprawdzić inne pakiety do [analizy danych przestrzennych](https://cran.r-project.org/web/views/Spatial.html)
+oraz [uczenia maszynowego](https://cran.r-project.org/web/views/MachineLearning.html).
+
+W razie problemów pomoc najlepiej szukać na [StackOverflow](https://stackoverflow.com/),
+lub [RStudio Community](https://community.rstudio.com/). Często ciekawe dyskusje
+pojawiają się na Twitterze ([#rspatial](https://twitter.com/hashtag/rspatial)) 
+oraz GitHubie (https://github.com/rspatial; https://github.com/r-spatial).
