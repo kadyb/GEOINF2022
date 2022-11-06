@@ -59,6 +59,7 @@ Interaktywne zeszyty (*.Rmd*) oraz statyczne dokumenty (*.html*) możesz pobrać
 
 1. [Klasyfikacja nienadzorowana](https://kadyb.github.io/GEOINF2022/Klasteryzacja.html)
 2. [Klasyfikacja nadzorowana](https://kadyb.github.io/GEOINF2022/Klasyfikacja.html)
+3. [Zadanie](https://kadyb.github.io/GEOINF2022/Zadanie.html)
 
 ## Kontakt
 
