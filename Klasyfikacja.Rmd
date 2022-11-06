@@ -34,8 +34,15 @@ cat = rast("dane/S2GLC_T33UXT.tif")
 cat
 ```
 
-Oprócz tego, wczytajmy jeszcze legendę, która znajduje się w pliku `S2GLC_T33UXT.csv`.
-Służy do tego funkcja `read.csv()`.
+Prosta wizualizacja klas pokrycia terenu.
+
+```{r}
+plot(cat, type = "classes")
+```
+
+Klasy przedstawione są jako ID, co nie jest dla nas zbyt przydatne. Oprócz danych
+rastrowych, musimy wczytać jeszcze tabelę atrybutów, która znajduje się w osobnym
+pliku `S2GLC_T33UXT.csv`. Możemy to zrobić za pomocą funkcji `read.csv()`.
 
 ```{r}
 leg = read.csv("dane/S2GLC_T33UXT.csv")
@@ -50,36 +57,51 @@ zapisie szesnastkowym, w trzeciej nazwa klasy.
 Jak można zauważyć, nasze rastry różnią się rozdzielczością przestrzenną (scena 
 Landsat ma 30 m, natomiast klasy pokrycia terenu 10 m). Kiedy rastry posiadają
 różne rozdzielczości, to nie jest możliwe wykonywanie na nich operacji matematycznych.
-W takim przypadku musimy sprowadzić je do jednakowej rozdzielczości. Z racji iż
-proste metody przepróbkowania nie zwiększają ilości informacji przy upscalingu,
-to lepiej wykonać przepróbkowanie do niższej rozdzielczości.
+W takim przypadku musimy sprowadzić je do jednakowej rozdzielczości. Ten
+proces nazywa się przepróbkowaniem (*resampling*).
 
-Przepróbkowanie (*resampling*) można wykonać przy pomocy funkcji `resample()`.
+Przepróbkowanie można wykonać:
+
+1. Z większej rozdzielczości do mniejszej, np. 100 m -> 500 m
+(*downsampling*, *downscaling*).
+2. Z mnieszej rozdzielczości do większej, np. 500 m -> 100 m
+(*upsampling*, *upscaling*).
+
+Z racji iż proste metody przepróbkowania nie zwiększają ilości informacji przy
+zwiększaniu rozdzielczości przestrzennej, to lepiej wykonać przepróbkowanie do
+niższej rozdzielczości.
+
+Przepróbkowanie w **terra** można wykonać przy pomocy funkcji `resample()`.
 Dostępne są różne metody przepróbkowania, ale w przypadku danych kategorycznych,
-koniecznie trzeba wykorzystać algorytm najbliższego sąsiada (`method = "near"`).
-Jeśli tego nie zrobimy, to ID kategorii zostaną zmienione.
+koniecznie trzeba wykorzystać algorytm najbliższego sąsiada (`method = "near"`)
+lub wartość modalną, dominantę (`method = "mode"`). Jeśli tego nie zrobimy,
+to ID kategorii zostaną zmienione.
 
 ```{r}
-cat = resample(cat, landsat, "near")
+cat = resample(cat, landsat, method = "near")
 res(cat) # wyświetl rozdzielczość po przepróbkowaniu
 ```
 
-Kolejne operacje (czyli przycinanie, maskowanie i skalowanie) przebiegają tak jak
-w poprzednim przykładzie.
+Kolejne operacje (czyli przycinanie, maskowanie, skalowanie i usunięcie wartości
+odstających) przebiegają tak jak w poprzednim przykładzie.
 
 ```{r}
+# przycinanie, maskowanie
 landsat = crop(landsat, poly, mask = TRUE)
 cat = crop(cat, poly, mask = TRUE)
 
+# skalowanie
 landsat = landsat * 2.75e-05 - 0.2
+
+# usunięcie wartości odstających
 landsat[landsat < 0] = NA
 landsat[landsat > 1] = NA
 ```
 
 ## Przygotowanie danych
 
-Teraz przygotujmy nasze dane do klasyfikacji. Tym razem jako model użyjemy [drzewo
-decyzyjne](https://www.statsoft.pl/textbook/stclatre.html), które wymaga danych
+Teraz przygotujmy nasze dane do klasyfikacji. Tym razem użyjemy modelu [drzewa
+decyzyjnego](https://www.statsoft.pl/textbook/stclatre.html), które wymaga danych
 w postaci ramki danych (*data frame*). Jedna kolumna to zmienna modelowana/zależna
 (u nas klasy pokrycia terenu), a pozostałe kolumny to zmienne wyjaśniające/niezależne
 (kanały spektralne).
@@ -100,7 +122,7 @@ w czasie, dlatego powinniśmy usunąć tę klasę (`ID = 0`).
 data = data[!data$S2GLC_T33UXT == 0, ]
 ```
 
-W celu ułatwienia analizy danych, możemy ID klasy zamienić na nazwę.
+W celu ułatwienia analizy danych, możemy zmienić ID klasy na nazwę.
 Dopasowanie nazw klas do ID można wykonać za pomocą funkcji `merge()`.
 Dodatkowo, zmieńmy jeszcze nazwę kolumny z `S2GLC_T33UXT` na `klasa`.
 
@@ -117,13 +139,12 @@ Dane wejściowe wyglądają teraz następująco.
 head(data)
 ```
 
-Przed klasyfikacją warto sprawdzić rozkład kategorii, tj. jak często pojawiają
-się poszczególne kategorie. Jeśli część kategorii pojawia się bardzo często,
-a niektóre prawie wcale, to wtedy mamy problem z niezbalansowanym zbiorem danych.
-W takiej sytuacji, kiedy model posiada zbyt mało przykładów którejś klasy (np. bagna),
-to nie jest możliwe żeby nauczył się rozpoznawać tę klasę. Oprócz tego, wynik
-jakości klasyfikatora jest zbyt optymistyczny (tzn. w rzeczywistości działa gorzej
-niż na zbiorze uczącym).
+Przed klasyfikacją warto sprawdzić częstość występowania poszczególnych kategorii.
+Jeśli część kategorii pojawia się bardzo często, a niektóre prawie wcale, to wtedy
+mamy problem z niezbalansowanym zbiorem danych. W takiej sytuacji, kiedy model
+posiada zbyt mało przykładów którejś klasy (np. bagna), to nie jest możliwe żeby
+nauczył się rozpoznawać tę klasę. Oprócz tego, wynik jakości klasyfikatora jest
+zbyt optymistyczny (tzn. w rzeczywistości działa gorzej niż na zbiorze uczącym).
 
 Częstość występowania klas można sprawdzić za pomocą funkcji `table()` na kolumnie
 kategorycznej i następnie zamienić to na postać procentową używając `prop.table()`.
@@ -141,13 +162,18 @@ library("rpart") # model klasyfikacyjny
 library("rpart.plot") # wizualizacja modelu
 ```
 
-Każdy opracowany model powinien zostać zwalidowany na niezależnym zbiorze danych.
-Oznacza to, że powinniśmy sprawdzić skuteczność naszego modelu na innym zbiorze
-danych, który nie został wykorzystany na etapie modelowania (uczenia). Istnieje
-kilka metod walidacji, ale wykorzystamy najprostszą polegającą na podziale
-wejściowego zbioru danych na treningowy oraz testowy. Proporcja między tymi dwoma
-zestawami powinna wynosić około 70-80% do 30-20%. Tak jak poprzednio musimy
-wylosować próbę o ustalonej wielkości używając funkcji `sample()`.
+Każdy opracowany model powinien zostać poddany walidacji (weryfikacji) na
+niezależnym zbiorze danych. Oznacza to, że powinniśmy sprawdzić poprawność
+prognozowania naszego modelu na innym zbiorze danych, który nie został wykorzystany
+na etapie modelowania (uczenia). Innymi słowy, chcemy wykluczyć sytuację, w której
+nasz model mógłby nauczyć się jednie klasyfikować obiekty na naszym obszarze analizy,
+a zwracałby błędne wyniki na innym (lecz podobnym) obszarze.
+
+Istnieje wiele metod walidacji, ale wykorzystamy tutaj najprostszą polegającą na
+podziale wejściowego zbioru danych na treningowy oraz testowy. Generalnie przyjmuje
+się, że proporcja między tymi dwoma zestawami powinna wynosić około 70-80% do
+30-20%. Tak jak poprzednio musimy wylosować próbę o ustalonej wielkości używając
+funkcji `sample()`.
 
 ```{r}
 # podział na zbiór treningowy i testowy
@@ -231,14 +257,14 @@ pred_map = predict(landsat, mdl, type = "class", na.rm = TRUE)
 ```
 
 Jako wynik powyższej operacji otrzymaliśmy mapę z predykcją klas pokrycia terenu.
-Teraz możemy dokonać wizualizacji. Tak jak w poprzednich przykładach wykorzystamy
-funkcję `plot()`. Jednak tym razem musimy wykorzystać odpowiedni schemat kolorów,
-który znajduje się w obiekcie `leg`. Tą operację należy wykonać w dwóch krokach:
+Teraz możemy dokonać wizualizacji. Jednak tym razem musimy użyć odpowiedniego
+schematu kolorów, który znajduje się w obiekcie `leg`. Tę operację należy wykonać
+w dwóch krokach:
 
 1. Sprawdzić, które klasy rzeczywiście występują na naszym obszarze.
 2. Dopasować kolory do odpowiednich klas.
 
-Odnośnie punkty pierwszego, to najprościej wykorzystać funkcję `droplevels()`,
+Odnośnie pierwszego punktu, to najprościej wykorzystać funkcję `droplevels()`,
 która usunie puste kategorie z rastra (np. winnica, wrzosowisko). Następnie
 należy wyświetlić kategorie za pomocą funkcji `levels()`. Do każdej warstwy rastra
 mogą być przypisane różne kategorie, więc musimy pobrać je tylko dla pierwszej
@@ -249,8 +275,13 @@ wskazujemy obiekt z naszymi klasami, jako drugi obiekt ramkę danych ze schemate
 kolorów (`leg`) i w wyniku otrzymamy dopasowane indeksy kolorów.
 
 ```{r}
-lv = levels(droplevels(pred_map))[[1]][["class"]]
-col_idx = match(lv, leg$Klasa)
+lv = droplevels(pred_map) # usuń puste kategorie z rastra
+lv = levels(lv) # zwróć kategorie jako ramkę danych
+lv = lv[[1]][["class"]] # wybierz pierwszą warstwę i kolumnę z nazwami klas
+```
+
+```{r}
+col_idx = match(lv, leg$Klasa) # dopasuj klasy do odpowiednich kolorów
 plot(pred_map, main = "Predykcja klas", col = leg$RGB[col_idx])
 ```
 
