@@ -310,7 +310,7 @@ można rozwinąć o kolejne zagadnienia dotyczące:
 - integracji różnych sensorów (satelity + drony),
 - przetwarzania danych w chmurze,
 - optymalizacji parametrów modeli,
-- innych metod walidacji wyników (w tym ujęciu przestrzennym),
+- innych metod walidacji wyników (w tym w ujęciu przestrzennym),
 - oceny istotności zmiennych wyjaśniających.
 
 Należy podkreślić, że zdjęcia satelitarne to nie jest jedyne źródło danych
@@ -318,7 +318,7 @@ przestrzennych i do analizy można wykorzystać zupełnie inne dane, np.
 cyfrowe modele wysokościowe czy zasięgi występowania gatunków.
 
 Jeśli zainteresowałeś się tym tematem, to jego rozwinięcie znajdziesz w poniższych
-podręcznikach (W j. angielskim):
+podręcznikach (w j. angielskim):
 
 - [**Spatial Data Science with R and “terra”**](https://rspatial.org/terra/)
 - [Geocomputation with R](https://geocompr.robinlovelace.net/)
