@@ -1,5 +1,6 @@
-W katalogu `XXX` znajdziesz taki sam zestaw danych jak dla materiałów szkoleniowych,
-ale dotyczy on innego obszaru (XXX). Wybierz jedno z poniższych zadań:
+W katalogu `zadanie` znajdziesz scenę Landsat 9 z 21 lipca 2022 r. obrazującą
+obszar powiatu wągrowieckiego. Jest to identyczny zestaw danych jak dla materiałów
+szkoleniowych.  Wybierz jedno z poniższych zadań:
 
 # 1. Klasyfikacja nienadzorowana
 
@@ -9,7 +10,6 @@ Opcjonalnie możesz przetestować inną [metodę](https://www.statmethods.net/ad
 3. Przedstaw wynik klasteryzacji na mapie i dobierz odpowiedni schemat kolorów.
 4. Spróbuj zinterpretować, co przedstawiają wydzielone klastry wykorzystując
 wykres pudełkowy oraz kompozycję kanałów spektralnych.
-
 
 # 2. Klasyfikacja nadzorowana
 
