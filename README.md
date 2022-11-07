@@ -52,7 +52,7 @@ Dokumentacje do tego pakietu znajdziesz tutaj: <https://rspatial.github.io/terra
 
 ## Materiały :triangular_flag_on_post:
 
-Niezbędne dane rastrowe (scena Landsat 8, klasyfikacja pokrycia terenu) oraz wektorowe znajdziesz na [Dysku Google](https://drive.google.com/file/d/1ZhKanbDEQXvPJHD76VlcHk1rucG4hss5/view).
+Niezbędne dane rastrowe (scena Landsat 8, klasyfikacja pokrycia terenu) oraz wektorowe znajdziesz na [Dysku Google](https://drive.google.com/file/d/1WfAYCd42nLoEhpyICJxoVOaGR-t1Jcdj/view).
 Po pobraniu dane należy rozpakować.
 
 Interaktywne zeszyty (*.Rmd*) oraz statyczne dokumenty (*.html*) możesz pobrać z repozytorium [https://github.com/kadyb/GEOINF2022](https://github.com/kadyb/GEOINF2022):
