@@ -162,16 +162,17 @@ rozciągnięcie kolorów używając argumentu `stretch = "lin"` lub `stretch = "
 plotRGB(landsat, r = 4, g = 3, b = 2, scale = 1, stretch = "lin")
 ```
 
-## Klasteryzacja
+## Grupowanie
 
 ```{r}
-# wczytanie pakietu do klasteryzacji
+# wczytanie pakietu do grupowania danych
 library("cluster")
 ```
 
-Modele do klasteryzacji (oraz klasyfikacji nadzorowanej) wymagają macierzy 
-lub ramki danych. Zatem dane do treningu musimy przygotować w odpowiedni sposób.
-Dane rastrowe można przetworzyć do macierzy przy użyciu funkcji `values()`.
+Dane do modelowania muszą zostać przygotowane w odpowiedni sposób. Modele
+klasyfikacyjne najczęściej na etapie trenowania wymagają macierzy lub ramki
+danych (*data frame*). Dane rastrowe można przetworzyć do macierzy przy użyciu
+funkcji `values()`.
 
 ```{r}
 mat = values(landsat)
@@ -195,7 +196,7 @@ nrow(mat_omit)
 
 Teraz przejdziemy do najważniejszego etapu analizy, czyli do wytrenowania modelu.
 Użyjemy prostego modelu [grupowania metodą k-średnich](https://www.statsoft.pl/textbook/stcluan.html#k)
-(*k-means*). Ten model wymaga jedynie, aby podać z góry liczbę klastrów/grup
+(*k-means*). Ten model wymaga jedynie, aby podać z góry liczbę grup/klastrów
 (argument `centers`). Jest to algorytm stochastyczny, więc za każdym razem
 zwraca inne wyniki. Żeby analiza była powtarzalna musimy ustawić ziarno
 losowości -- `set.seed()`.
@@ -207,7 +208,7 @@ mdl = kmeans(mat_omit, centers = 5)
 
 W wyniku powyższej operacji otrzymaliśmy m.in.:
 
-1. Obliczone średnie wartości klastrów dla poszczególnych kanałów (`mdl$centers`).
+1. Obliczone średnie wartości grup dla poszczególnych kanałów (`mdl$centers`).
 2. Wektor ze sklasyfikowanymi wartościami macierzy (`mdl$cluster`).
 
 Wyświetlmy te obiekty:
@@ -232,7 +233,7 @@ przypadku jest to 1 238 760.
 vec = rep(NA, ncell(landsat)) # przygotuj pusty wektor
 ```
 
-Następnie musimy przypisać nasze klastry w wektorze w odpowiednie miejsca,
+Następnie musimy przypisać nasze grupy w wektorze w odpowiednie miejsca,
 tj. tym, które nie są zamaskowane (`NA`). Do niezamaskowanych
 wartości można odwołać się przez funkcję `complete.cases()`. 
 
@@ -248,17 +249,17 @@ warstwą, i przypisać mu wartości wektora `vec`.
 clustering = rast(landsat, nlyrs = 1, vals = vec)
 ```
 
-Sprawdźmy teraz jak wygląda klasteryzacja naszego obszaru na mapie.
+Sprawdźmy teraz jak wyglądają utworzone grupy na mapie.
 
 ```{r}
 colors = rainbow(5, alpha = NULL) # wybierz 5 kolorów z wbudowanej palety `rainbow`
 plot(clustering, type = "classes", col = colors)
 ```
 
-Istotą klasteryzacji jest stworzenie grupy składających się z podobnych elementów.
+Istotą grupowania jest stworzenie grupy składających się z podobnych elementów.
 Natomiast naszym zadaniem jest interpretacja, co przedstawiają utworzone grupy
 oraz ich nazwanie. Interpretacja jest trudnym zadaniem, a często jej wyniki są
-niejasne. W tym celu, niezbędna jest analiza statystyk opisowych klastrów oraz
+niejasne. W tym celu, niezbędna jest analiza statystyk opisowych grup oraz
 wspomaganie się różnymi kompozycjami (w naturalnych oraz fałszywszy kolorach).
 Bardzo przydatna jest również wiedza o właściwościach spektralnych obiektów.
 
@@ -271,8 +272,8 @@ plot(clustering, col = colors, type = "classes", levels = category)
 ```
 
 Jeśli wynik jest satysfakcjonujący, to możemy go zapisać używając funkcji
-`writeRaster()`. Taki plik można później wczytać w R lub innym programie
-obsługującym dane przestrzenne (np. QGIS).
+`writeRaster()`. Taki plik można później wczytać w **R** lub innym programie
+obsługującym dane przestrzenne (np. **QGIS**).
 
 ```{r eval=FALSE}
 writeRaster(clustering, "clustering.tif")
@@ -280,7 +281,7 @@ writeRaster(clustering, "clustering.tif")
 
 ## Wizualizacje
 
-Do analizy właściwości klastrów, zamiast statystyk opisowych, mogą zostać
+Do analizy i charakteryzacji grup, zamiast statystyk opisowych, mogą zostać
 wykorzystane wizualizacje. Największe możliwości dostarcza pakiet **ggplot2**.
 Tutaj można znaleźć darmowy [podręcznik](https://ggplot2-book.org/)
 oraz gotowe ["przepisy"](https://r-graphics.org/).
@@ -309,7 +310,7 @@ idx = sample(1:nrow(mat_omit), size = 10000)
 head(idx) # wyświetl 6 pierwszy indeksów
 ```
 
-Połączmy teraz wylosowane wiersze z macierzy z odpowiednimi klastrami (`cbind()`).
+Połączmy teraz wylosowane wiersze z macierzy z odpowiednimi grupami (`cbind()`).
 Następnie macierz zamienimy na ramkę danych (`as.data.frame()`).
 
 ```{r}
@@ -356,4 +357,4 @@ ggplot(stats, aes(x = band, y = value, fill = cluster)) +
 ```
 
 Zmieniając `facet_wrap(vars(cluster))` na `facet_wrap(vars(band))`, zamiast
-zestawienia kanałów w poszczególnych panelach, możemy zestawić klastry.
+zestawienia kanałów w poszczególnych panelach, możemy zestawić grupy.
