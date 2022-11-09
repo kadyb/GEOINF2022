@@ -50,7 +50,7 @@ library("terra")
 
 Dokumentację do tego pakietu znajdziesz tutaj: <https://rspatial.github.io/terra/reference/terra-package.html>
 
-## Materiały :triangular_flag_on_post:
+## Materiały &#128681;
 
 Niezbędne dane rastrowe (scena Landsat 8, klasyfikacja pokrycia terenu) oraz wektorowe znajdziesz na [Dysku Google](https://drive.google.com/file/d/1WfAYCd42nLoEhpyICJxoVOaGR-t1Jcdj/view) oraz [Zenodo](https://zenodo.org/record/7299645).
 Po pobraniu dane należy rozpakować.
