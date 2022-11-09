@@ -57,7 +57,7 @@ Po pobraniu dane należy rozpakować.
 
 Interaktywne zeszyty (*.Rmd*) oraz statyczne dokumenty (*.html*) możesz pobrać z repozytorium [https://github.com/kadyb/GEOINF2022](https://github.com/kadyb/GEOINF2022):
 
-1. [Klasyfikacja nienadzorowana](https://kadyb.github.io/GEOINF2022/Klasteryzacja.html)
+1. [Klasyfikacja nienadzorowana](https://kadyb.github.io/GEOINF2022/Grupowanie.html)
 2. [Klasyfikacja nadzorowana](https://kadyb.github.io/GEOINF2022/Klasyfikacja.html)
 3. [Zadanie](https://kadyb.github.io/GEOINF2022/Zadanie.html)
 
